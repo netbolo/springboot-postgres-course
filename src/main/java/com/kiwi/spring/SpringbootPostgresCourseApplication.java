@@ -1,9 +1,7 @@
 package com.kiwi.spring;
 
 import com.github.javafaker.Faker;
-import com.kiwi.spring.model.Book;
-import com.kiwi.spring.model.Student;
-import com.kiwi.spring.model.StudentIdCard;
+import com.kiwi.spring.model.*;
 import com.kiwi.spring.repository.StudentIdCardRepository;
 import com.kiwi.spring.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -40,10 +38,8 @@ public class SpringbootPostgresCourseApplication {
       student.addBook(
           new Book("Clean Code", LocalDateTime.now().minusDays(4)));
 
-
       student.addBook(
           new Book("Think and Grow Rich", LocalDateTime.now()));
-
 
       student.addBook(
           new Book("Spring Data JPA", LocalDateTime.now().minusYears(1)));
@@ -53,6 +49,28 @@ public class SpringbootPostgresCourseApplication {
           student);
 
       student.setStudentIdCard(studentIdCard);
+
+      student.addEnrolment(new Enrolment(
+          new EnrolmentId(1L, 1L),
+          student,
+          new Course("Computer Science", "IT"),
+          LocalDateTime.now()
+      ));
+
+      student.addEnrolment(new Enrolment(
+          new EnrolmentId(1L, 2L),
+          student,
+          new Course("Amigoscode Spring Data JPA", "IT"),
+          LocalDateTime.now().minusDays(18)
+      ));
+
+      student.addEnrolment(new Enrolment(
+          new EnrolmentId(1L, 2L),
+          student,
+          new Course("Amigoscode Spring Data JPA", "IT"),
+          LocalDateTime.now().minusDays(18)
+      ));
+
 
       studentRepository.save(student);
 
@@ -65,12 +83,6 @@ public class SpringbootPostgresCourseApplication {
                   s.getFirstName() + " borrowed " + book.getBookName());
             });
           });
-//
-//            studentIdCardRepository.findById(1L)
-//                    .ifPresent(System.out::println);
-
-//            studentRepository.deleteById(1L);
-
     };
   }
 }
