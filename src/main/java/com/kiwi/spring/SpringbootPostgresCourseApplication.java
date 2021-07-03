@@ -1,6 +1,9 @@
 package com.kiwi.spring;
 
+import com.github.javafaker.Faker;
 import com.kiwi.spring.model.Student;
+import com.kiwi.spring.model.StudentIdCard;
+import com.kiwi.spring.repository.StudentIdCardRepository;
 import com.kiwi.spring.repository.StudentRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,49 +20,50 @@ public class SpringbootPostgresCourseApplication {
   }
 
   @Bean
-  CommandLineRunner commandLineRunner(StudentRepository studentRepository) {
+  CommandLineRunner commandLineRunner(
+      StudentRepository studentRepository,
+      StudentIdCardRepository studentIdCardRepository) {
     return args -> {
-      Student maria = new Student(
-          "Maria",
-          "Jones",
-          "maria.jones@amigoscode.edu",
-          21
-      );
+      Faker faker = new Faker();
 
-      Student maria2 = new Student(
-          "Maria",
-          "Jones",
-          "maria2.jones@amigoscode.edu",
-          25
-      );
+      String firstName = faker.name().firstName();
+      String lastName = faker.name().lastName();
+      String email = String.format("%s.%s@amigoscode.edu", firstName, lastName);
+      Student student = new Student(
+          firstName,
+          lastName,
+          email,
+          faker.number().numberBetween(17, 55));
 
-      Student ahmed = new Student(
-          "Ahmed",
-          "Ali",
-          "ahmed.ali@amigoscode.edu",
-          18
-      );
+      StudentIdCard studentIdCard = new StudentIdCard(
+          "123456789",
+          student);
 
-      studentRepository.saveAll(List.of(maria, ahmed, maria2));
+      studentIdCardRepository.save(studentIdCard);
 
-      studentRepository
-          .findStudentByEmail("ahmed.ali@amigoscode.edu")
-          .ifPresentOrElse(
-              System.out::println,
-              () -> System.out.println("Student with email ahmed.ali@amigoscode.edu not found"));
+      studentRepository.findById(1L)
+          .ifPresent(System.out::println);
 
-      studentRepository.selectStudentWhereFirstNameAndAgeGreaterOrEqual(
-          "Maria",
-          21
-      ).forEach(System.out::println);
+      studentIdCardRepository.findById(1L)
+          .ifPresent(System.out::println);
 
-      studentRepository.selectStudentWhereFirstNameAndAgeGreaterOrEqualNative(
-          "Maria",
-          21
-      ).forEach(System.out::println);
+      studentRepository.deleteById(1L);
 
-      System.out.println("Deleting Maria 2");
-      System.out.println(studentRepository.deleteStudentById(3L));
     };
+  }
+
+  private void generateRandomStudents(StudentRepository studentRepository) {
+    Faker faker = new Faker();
+    for (int i = 0; i < 20; i++) {
+      String firstName = faker.name().firstName();
+      String lastName = faker.name().lastName();
+      String email = String.format("%s.%s@amigoscode.edu", firstName, lastName);
+      Student student = new Student(
+          firstName,
+          lastName,
+          email,
+          faker.number().numberBetween(17, 55));
+      studentRepository.save(student);
+    }
   }
 }
